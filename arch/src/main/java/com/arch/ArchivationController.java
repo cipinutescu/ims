@@ -31,9 +31,9 @@ public class ArchivationController {
     @ResponseBody
     String retrieveArchMessages() throws IOException {
         String time = HttpUtils.sendGet("http://localhost:8889/getTimestamp");
-        String s = "Time of archivation : " + time + "\\n";
+        String s = "Time of archivation : " + time + "\n";
         for(Message message : messages){
-            s = s  + "{ " + message.getUsername() + "  } : { " + message.getTimestamp() + " } : " + message.getMessage() + "\\n";
+            s = s  + "{ " + message.getUsername() + "  } : { " + message.getTimestamp() + " } : " + message.getMessage() + "\n";
         }
         return s;
     }

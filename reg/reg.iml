@@ -79,13 +79,5 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.10" level="project" />
     <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
-    <orderEntry type="module" module-name="auth" />
-    <orderEntry type="module" module-name="chat" />
-    <orderEntry type="module" module-name="time" />
-    <orderEntry type="library" name="Maven: commons-net:commons-net:3.0.1" level="project" />
-    <orderEntry type="module" module-name="arch" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.1" level="project" />
-    <orderEntry type="module" module-name="ftp" />
-    <orderEntry type="module" module-name="reg" />
   </component>
 </module>

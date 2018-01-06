@@ -29,6 +29,7 @@
         <module name="ftp" />
         <module name="ims" />
         <module name="main" />
+        <module name="reg" />
         <module name="time" />
       </profile>
     </annotationProcessing>
@@ -40,6 +41,7 @@
       <module name="ftp" target="1.8" />
       <module name="ims" target="1.8" />
       <module name="main" target="1.8" />
+      <module name="reg" target="1.8" />
       <module name="time" target="1.8" />
     </bytecodeTargetLevel>
   </component>

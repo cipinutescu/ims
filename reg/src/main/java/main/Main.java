@@ -4,16 +4,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-import java.io.IOException;
-
-@ComponentScan({"com.time"})
+@ComponentScan({"com.reg"})
 @SpringBootApplication
 public class Main {
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         SpringApplication.run(Main.class, args);
-        System.out.println("Time microservice started !");
+        System.out.println("Registration microservice started !");
     }
 }

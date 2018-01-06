@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/ftp/ftp.iml" filepath="$PROJECT_DIR$/ftp/ftp.iml" />
       <module fileurl="file://$PROJECT_DIR$/ims.iml" filepath="$PROJECT_DIR$/ims.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/main.iml" filepath="$PROJECT_DIR$/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reg/reg.iml" filepath="$PROJECT_DIR$/reg/reg.iml" />
       <module fileurl="file://$PROJECT_DIR$/time/time.iml" filepath="$PROJECT_DIR$/time/time.iml" />
     </modules>
   </component>
