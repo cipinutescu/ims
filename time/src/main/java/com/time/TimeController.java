@@ -35,11 +35,7 @@ public class TimeController {
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/getTimestamp")
     public @ResponseBody String getTime() throws IOException{
-        if(timeFromNTP == null){
-            return syncTime();
-        } else {
-            return timeFromNTP;
-        }
+        return syncTime();
     }
 
 

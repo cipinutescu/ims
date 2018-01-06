@@ -26,6 +26,7 @@
         <module name="auth" />
         <module name="chat" />
         <module name="client" />
+        <module name="ftp" />
         <module name="ims" />
         <module name="main" />
         <module name="time" />
@@ -36,6 +37,7 @@
       <module name="auth" target="1.8" />
       <module name="chat" target="1.8" />
       <module name="client" target="1.8" />
+      <module name="ftp" target="1.8" />
       <module name="ims" target="1.8" />
       <module name="main" target="1.8" />
       <module name="time" target="1.8" />

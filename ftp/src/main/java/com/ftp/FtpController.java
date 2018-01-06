@@ -1,60 +1,87 @@
-package com.chat;
+package com.ftp;
 
-import antlr.debug.MessageAdapter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by Ciprian on 6/8/2016.
  */
 @RestController
-public class ChatController {
+public class FtpController {
 
-    public List<Message> messages;
+    public List<Message> files;
 
     @PostConstruct
     public void init(){
-        messages = new ArrayList<>();
+        files = new ArrayList<>();
     }
 
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/sendMessage", method = RequestMethod.POST)
+    @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
     public
     @ResponseBody
-    String sendMessage(@RequestBody String message,
+    Message uploadFile(@RequestBody String fileUrl,
                        @RequestParam(value = "user", defaultValue = "") String user) throws Exception {
         String time = HttpUtils.sendGet("http://localhost:8889/getTimestamp");
-        if(message.contains("upload file")){
-            StringTokenizer st = new StringTokenizer(message,"->");
-            st.nextToken();
-            Message mess = new ObjectMapper()
-                    .readValue(HttpUtils.sendPost("http://localhost:8889/uploadFile?user="+user,st.nextToken()),Message.class);
-            messages.add(new Message(user,mess.getMessage(),mess.getTimestamp()));
-            return "OK";
-        } else {
-            messages.add(new Message(user, message, time));
-            return "OK";
+
+        String file = "";
+        BufferedReader br = null;
+        FileReader fr = null;
+
+        try {
+
+            //br = new BufferedReader(new FileReader(FILENAME));
+            fr = new FileReader(fileUrl);
+            br = new BufferedReader(fr);
+
+            String sCurrentLine;
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                file += sCurrentLine;
+            }
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            try {
+
+                if (br != null)
+                    br.close();
+
+                if (fr != null)
+                    fr.close();
+
+            } catch (IOException ex) {
+
+                ex.printStackTrace();
+
+            }
         }
+
+
+
+        files.add(new Message(user,file,time));
+        return new Message(user,"Upload complete : http://localhost:8889/downloadFile",time);
     }
 
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/receiveMessages", method = RequestMethod.GET)
+    @RequestMapping(value = "/downloadFile", method = RequestMethod.GET)
     public
     @ResponseBody
-    List<Message> receiveMessage(@RequestParam(value = "index", defaultValue = "") Integer index) throws Exception {
-        if(messages.size() - index > 5){
-            HttpUtils.sendPost("http://localhost:8889/archMessages",messages.toString());
-            String url = "http://localhost:8889/retrieveArchMessages";
-            return Collections.singletonList(new Message("Archiever",url,String.valueOf(messages.size())));
-        }
-
-        return messages.subList(index,messages.size());
+    String downloadFile() throws Exception {
+        return files.get(files.size()-1).getMessage();
     }
 
     public static class Message{

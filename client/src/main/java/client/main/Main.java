@@ -4,14 +4,15 @@ package client.main;
 import client.comm.HttpUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static javax.script.ScriptEngine.FILENAME;
 
 public class Main {
 
@@ -109,10 +110,10 @@ public class Main {
                 },0,2, TimeUnit.SECONDS);
 
 
-                while(true){
+                while(true) {
                     scanner = new Scanner(System.in).useDelimiter("\\n");
                     String message = scanner.next();
-                    if(message.equals("exit")){
+                    if (message.equals("exit")) {
                         System.out.println("bye bye!");
                         break;
                     }
