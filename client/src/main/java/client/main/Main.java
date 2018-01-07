@@ -4,33 +4,121 @@ package client.main;
 import client.comm.HttpUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static javax.script.ScriptEngine.FILENAME;
 
 public class Main {
+
+    static String sentText;
+    static Thread mainThread;
+    static Object staticObject = new Object();
+    static boolean inWindow = false;
+
+    static class ChatFrame extends JFrame implements Observer {
+
+        public JTextArea textArea;
+        private JTextField inputTextField;
+        private JButton sendButton;
+
+        public ChatFrame() {
+            buildGUI();
+        }
+
+        /** Builds the user interface */
+        private void buildGUI() {
+            this.setPreferredSize(new Dimension(600,400));
+            textArea = new JTextArea(40, 80);
+            textArea.setEditable(false);
+            textArea.setLineWrap(true);
+
+            Font font = new Font("Verdana", Font.BOLD, 15);
+            textArea.setFont(font);
+            add(new JScrollPane(textArea), BorderLayout.CENTER);
+
+            Box box = Box.createHorizontalBox();
+            add(box, BorderLayout.SOUTH);
+            inputTextField = new JTextField();
+            inputTextField.setFont(font);
+
+            sendButton = new JButton("Send");
+            box.add(inputTextField);
+            box.add(sendButton);
+
+            // Action for the inputTextField and the goButton
+            ActionListener sendListener = new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    String str = inputTextField.getText();
+                    inputTextField.selectAll();
+                    inputTextField.requestFocus();
+                    inputTextField.setText("");
+                    if(!inWindow)
+                        textArea.append(str + "\n");
+                    sentText = str;
+                    synchronized (staticObject) {
+                        staticObject.notify();
+                    }
+                }
+            };
+            inputTextField.addActionListener(sendListener);
+            sendButton.addActionListener(sendListener);
+        }
+
+        /** Updates the UI depending on the Object argument */
+        public void update(Observable o, Object arg) {
+            final Object finalArg = arg;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    textArea.append(finalArg.toString());
+                    textArea.append("\n");
+                }
+            });
+        }
+    }
 
     private static final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
 
     public static void main(String[] args) throws Exception {
 
+        ChatFrame chatFrame = new ChatFrame();
+        chatFrame.setTitle("My chat app");
+        chatFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        chatFrame.pack();
+        chatFrame.setLocationRelativeTo(null);
+        chatFrame.setResizable(false);
+        chatFrame.setVisible(true);
+
         boolean loginOption = false;
         boolean registerOption = false;
         final List<Message> messagesReceived = new ArrayList<>();
         List<Message> messagesShown = new ArrayList<>();
+
+        mainThread = Thread.currentThread();
         while(true){
 
-            System.out.println("Welcome to Chat Room.");
-            System.out.println("Enter : \n 1.For login\n 2.For registration");
-            Scanner scanner = new Scanner(System.in);
-            String option = scanner.next();
+            //System.out.println("Welcome to Chat Room.");
+            chatFrame.textArea.append("Welcome to Chat Room.\n");
+            //System.out.println("Enter : \n 1.For login\n 2.For registration");
+            chatFrame.textArea.append("Enter : \n 1.For login\n 2.For registration\n");
+            //Scanner scanner = new Scanner(System.in);
+            //String option = scanner.next();
+            synchronized (staticObject) {
+                staticObject.wait();
+            }
+            String option = sentText;
             if(option.contains("1")){
                 loginOption = true;
                 break;
@@ -38,18 +126,31 @@ public class Main {
                 registerOption = true;
                 break;
             } else {
-                System.out.println("No valid option entered!");
+                //System.out.println("No valid option entered!");
+                chatFrame.textArea.append("No valid option entered!\n");
             }
         }
 
         if(registerOption){
 
-            System.out.println("Registration page\n\nPlease specified your credentials : ");
-            System.out.print("Username : ");
-            Scanner scanner = new Scanner(System.in);
-            String username = scanner.next();
-            System.out.print("Password : ");
-            String password = scanner.next();
+            //System.out.println("Registration page\n\nPlease specified your credentials : ");
+            //System.out.print("Username : ");
+            chatFrame.textArea.append("Registration page\n\nPlease specified your credentials : \n");
+            chatFrame.textArea.append("Username : ");
+            //Scanner scanner = new Scanner(System.in);
+            //String username = scanner.next();
+            synchronized (staticObject) {
+                staticObject.wait();
+            }
+            String username = sentText;
+
+            //System.out.print("Password : ");
+            chatFrame.textArea.append("Password : ");
+            //String password = scanner.next();
+            synchronized (staticObject) {
+                staticObject.wait();
+            }
+            String password = sentText;
             String responseFromRegistrationService = null;
             try {
                 responseFromRegistrationService = HttpUtils.sendGet("http://localhost:8889/register?username="+username+"&password="+password);
@@ -58,18 +159,33 @@ public class Main {
             }
 
             if(responseFromRegistrationService != null && responseFromRegistrationService.equals("SUCCESS")){
-                System.out.println("Registration was successful !");
+                //System.out.println("Registration was successful !");
+                chatFrame.textArea.append("Registration was successful !\n");
                 loginOption = true;
             }
         }
 
         if(loginOption){
-            System.out.println("Login page \n\nPlease specified your credentials : ");
-            System.out.print("Username : ");
-            Scanner scanner = new Scanner(System.in);
-            String username = scanner.next();
-            System.out.print("Password : ");
-            String password = scanner.next();
+            //System.out.println("Login page \n\nPlease specified your credentials : ");
+            chatFrame.textArea.append("Login page \n\nPlease specified your credentials : \n");
+            //System.out.print("Username : ");
+            chatFrame.textArea.append("Username :");
+            //Scanner scanner = new Scanner(System.in);
+            //String username = scanner.next();
+            synchronized (staticObject) {
+                staticObject.wait();
+            }
+            String username = sentText;
+
+
+            //System.out.print("Password : ");
+            chatFrame.textArea.append("Password: ");
+            //String password = scanner.next();
+            synchronized (staticObject) {
+                staticObject.wait();
+            }
+            String password = sentText;
+
             String responseFromRegistrationService = null;
             try {
                 responseFromRegistrationService = HttpUtils.sendGet("http://localhost:8889/login?username="+username+"&password="+password);
@@ -78,8 +194,9 @@ public class Main {
             }
 
             if(responseFromRegistrationService != null && responseFromRegistrationService.equals("SUCCESS")){
-                System.out.println("Authentification was successful !");
-
+                //System.out.println("Authentification was successful !");
+                chatFrame.textArea.append("Authentification was successful !\n");
+                inWindow = true;
                 scheduler.scheduleAtFixedRate((Runnable) () -> {
                     String messages = null;
                     try {
@@ -96,14 +213,16 @@ public class Main {
                     }
                     if(newMessages.size() == 1 && newMessages.get(0).getUsername().equals("Archiever")){
                         messagesReceived.clear();
-                        System.out.println("Too many messges to show ! Archieved messages at address : "+ newMessages.get(0).getMessage());
+                        //System.out.println("Too many messges to show ! Archieved messages at address : "+ newMessages.get(0).getMessage());
+                        chatFrame.textArea.append("Too many messges to show ! Archieved messages at address : "+ newMessages.get(0).getMessage() + "\n");
                         for(int i=0; i< Integer.valueOf(newMessages.get(0).getTimestamp());i++){
                             messagesReceived.add(new Message());
                         }
 
                     } else {
                         for (Message message : newMessages) {
-                            System.out.println("{ " + message.getUsername() + "  } : { " + message.getTimestamp() + " } : " + message.getMessage());
+                            //System.out.println("{ " + message.getUsername() + "  } : { " + message.getTimestamp() + " } : " + message.getMessage());
+                            chatFrame.textArea.append("{ " + message.getUsername() + "  } : { " + message.getTimestamp() + " } : " + message.getMessage() + "\n");
                             messagesShown.add(message);
                         }
                     }
@@ -111,10 +230,16 @@ public class Main {
 
 
                 while(true) {
-                    scanner = new Scanner(System.in).useDelimiter("\\n");
-                    String message = scanner.next();
+                    //scanner = new Scanner(System.in).useDelimiter("\\n");
+                    //String message = scanner.next();
+                    synchronized (staticObject) {
+                        staticObject.wait();
+                    }
+                    String message = sentText;
+
                     if (message.equals("exit")) {
-                        System.out.println("bye bye!");
+                        //System.out.println("bye bye!");
+                        chatFrame.textArea.append("Bye bye!\n");
                         break;
                     }
                     String status = HttpUtils.sendPost("http://localhost:8889/sendMessage?user="+username,message);
