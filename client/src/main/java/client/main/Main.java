@@ -89,7 +89,7 @@ public class Main {
     }
 
     private static final ScheduledExecutorService scheduler =
-            Executors.newScheduledThreadPool(1);
+            Executors.newScheduledThreadPool(2);
 
     public static void main(String[] args) throws Exception {
 
@@ -228,22 +228,32 @@ public class Main {
                     }
                 },0,2, TimeUnit.SECONDS);
 
-
-                while(true) {
-                    //scanner = new Scanner(System.in).useDelimiter("\\n");
-                    //String message = scanner.next();
+                scheduler.scheduleAtFixedRate((Runnable) () -> {
                     synchronized (staticObject) {
-                        staticObject.wait();
+                        try {
+                            staticObject.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                     String message = sentText;
 
                     if (message.equals("exit")) {
                         //System.out.println("bye bye!");
                         chatFrame.textArea.append("Bye bye!\n");
-                        break;
+                        System.exit(0);
                     }
-                    String status = HttpUtils.sendPost("http://localhost:8889/sendMessage?user="+username,message);
-                }
+                    try {
+                        String status = HttpUtils.sendPost("http://localhost:8889/sendMessage?user="+username,message);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                },0,1,TimeUnit.SECONDS);
+//                while(true) {
+                    //scanner = new Scanner(System.in).useDelimiter("\\n");
+                    //String message = scanner.next();
+//                                 }
             }
         }
 
