@@ -25,6 +25,7 @@ public class Main {
     static String sentText;
     static Thread mainThread;
     static Object staticObject = new Object();
+    static boolean inWindow = false;
 
     static class ChatFrame extends JFrame implements Observer {
 
@@ -38,10 +39,12 @@ public class Main {
 
         /** Builds the user interface */
         private void buildGUI() {
+            this.setPreferredSize(new Dimension(600,400));
             textArea = new JTextArea(40, 80);
             textArea.setEditable(false);
             textArea.setLineWrap(true);
-            Font font = new Font("Verdana", Font.BOLD, 30);
+
+            Font font = new Font("Verdana", Font.BOLD, 15);
             textArea.setFont(font);
             add(new JScrollPane(textArea), BorderLayout.CENTER);
 
@@ -49,6 +52,7 @@ public class Main {
             add(box, BorderLayout.SOUTH);
             inputTextField = new JTextField();
             inputTextField.setFont(font);
+
             sendButton = new JButton("Send");
             box.add(inputTextField);
             box.add(sendButton);
@@ -60,8 +64,8 @@ public class Main {
                     inputTextField.selectAll();
                     inputTextField.requestFocus();
                     inputTextField.setText("");
-
-                    textArea.append(str + "\n");
+                    if(!inWindow)
+                        textArea.append(str + "\n");
                     sentText = str;
                     synchronized (staticObject) {
                         staticObject.notify();
@@ -192,7 +196,7 @@ public class Main {
             if(responseFromRegistrationService != null && responseFromRegistrationService.equals("SUCCESS")){
                 //System.out.println("Authentification was successful !");
                 chatFrame.textArea.append("Authentification was successful !\n");
-
+                inWindow = true;
                 scheduler.scheduleAtFixedRate((Runnable) () -> {
                     String messages = null;
                     try {
